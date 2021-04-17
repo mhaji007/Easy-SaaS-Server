@@ -37,3 +37,10 @@ app.use(cors());
 const port = process.env.PORT || 9090;
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));
+
+// Add uncaught exception handler (errors that are not handled by any funciton)
+// will reach here are logged (to be handled later)
+process.on("uncaughtException", error => {
+  console.log("uncaughtException")
+  console.log("error", error)
+})
