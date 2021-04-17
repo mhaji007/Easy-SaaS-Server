@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const compression = require("compression");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -14,11 +15,12 @@ const app = express();
 
 
 // Global middlewares (to be used on all routes)
+app.use(compression())
 app.use(morgan("dev"));
 
 // JSON data's limit by default is 1mb
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: "true" }));
+app.use(bodyParser.json({ limit: "5mb" }));
+// app.use(bodyParser.urlencoded({ limit: "5mb", extended: "true" }));
 app.use(cookieParser());
 
 
