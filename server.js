@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const mongoose = require("mongoose")
 const compression = require("compression");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -8,10 +9,22 @@ const fs = require("fs");
 require("dotenv").config();
 
 // Import routes
+const authRoutes = require("./routes/auth");
 
 
 // Initialize app
 const app = express();
+
+// Connect to databse
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Successfully connected to the Database"))
+  .catch((err) => console.log("Database connection error", err));
 
 
 // Global middlewares (to be used on all routes)
@@ -33,6 +46,7 @@ app.use(cors());
 // app.use(cors({ origin: process.env.CLIENT_URL }));
 
 // Route middlewares
+app.use("/api", authRoutes);
 
 const port = process.env.PORT || 9090;
 
