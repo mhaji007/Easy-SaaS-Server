@@ -1,4 +1,6 @@
-exports.register = (req, res, next) => {
+const User = require("../models/User");
+
+exports.register = async (req, res, next) => {
   const { email, password } = req.body;
 
   const validationErrors = [];
@@ -14,6 +16,7 @@ exports.register = (req, res, next) => {
   }
 
   const isEmailValid = validateEmail(email);
+
   if (email && !isEmailValid) {
     validationErrors.push({
       code: "VALIDATION_ERROR",
@@ -37,6 +40,44 @@ exports.register = (req, res, next) => {
     };
     res.send(errorObject);
     return;
+  }
+
+  try {
+    // Save to Database
+    console.log("Credentials", email, password)
+    const existingUser = await User.findOne({ email:email });
+    console.log("existingUser?", existingUser)
+    if (existingUser) {
+      const errorObject = {
+        error: true,
+        errors: [
+          {
+            code: "VALIDATION_ERROR",
+            field: "email",
+            message: "Email already exists",
+          }
+        ],
+      };
+      // 422 => unprocessable entity
+      // (valid request, but decided not to process)
+      res.status(422).send(errorObject);
+      return;
+    }
+
+    let user = new User({
+      email,
+      password,
+    });
+
+    const savedUser = await user.save();
+
+    console.log("savedUser", savedUser);
+
+    res.status(200).send({
+      user: savedUser,
+    });
+  } catch (error) {
+    console.log("e", error);
   }
 };
 

@@ -6,12 +6,12 @@ const { ObjectId } = mongoose.Schema;
 
 // If statement prevents model to be defined
 // again and again upon import
-if (!User) {
+// if (!User) {
   const userSchema = new mongoose.Schema(
     {
       name: {
         type: String,
-        required: "Name is required",
+        // required: "Name is required",
         maxlength: [150, "Name cannot exceed 150 characters"],
       },
       email: {
@@ -40,6 +40,6 @@ if (!User) {
     { timestamps: true }
   );
   User = mongoose.model("User", userSchema);
-}
+// }
 
 module.exports = User;
