@@ -1,7 +1,9 @@
 const User = require("../models/User");
 
+
 exports.register = async (req, res, next) => {
-  const { email, password } = req.body;
+
+  const {email, password} = req.body;
 
   const validationErrors = [];
   // Validate the input fields
@@ -38,15 +40,13 @@ exports.register = async (req, res, next) => {
       error: true,
       errors: validationErrors,
     };
-    res.send(errorObject);
+    res.status(422).send(errorObject);
     return;
   }
 
   try {
     // Save to Database
-    console.log("Credentials", email, password)
     const existingUser = await User.findOne({ email:email });
-    console.log("existingUser?", existingUser)
     if (existingUser) {
       const errorObject = {
         error: true,
@@ -60,6 +60,7 @@ exports.register = async (req, res, next) => {
       };
       // 422 => unprocessable entity
       // (valid request, but decided not to process)
+      // res.status(422).json(errorObject);
       res.status(422).send(errorObject);
       return;
     }
@@ -81,7 +82,56 @@ exports.register = async (req, res, next) => {
   }
 };
 
-exports.login = (req, res, next) => {};
+exports.login = (req, res, next) => {
+const { email, password } = req.body;
+
+const validationErrors = [];
+// Validate the input fields
+if (!email) {
+  // Define the shape of error object
+  // for the whole application
+  validationErrors.push({
+    code: "VALIDATION_ERROR",
+    field: "email",
+    message: "You must provide an email address",
+  });
+}
+
+const isEmailValid = validateEmail(email);
+
+if (email && !isEmailValid) {
+  validationErrors.push({
+    code: "VALIDATION_ERROR",
+    field: "email",
+    message: "Email is not valid",
+  });
+}
+
+if (!password) {
+  validationErrors.push({
+    code: "VALIDATION_ERROR",
+    field: "password",
+    message: "You must provide a password",
+  });
+}
+
+if (validationErrors.length) {
+  const errorObject = {
+    error: true,
+    errors: validationErrors,
+  };
+  res.status(422).send(errorObject);
+  return;
+}
+
+res.status(200).send({
+  success: true,
+})
+
+
+
+
+};
 
 exports.logout = (req, res, next) => {};
 
